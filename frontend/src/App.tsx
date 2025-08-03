@@ -16,6 +16,12 @@ export default function App() {
     { role: "user" | "ai"; message: string }[]
   >([]);
 
+  const [style, setStyle] = useState<string>("Conversational");
+  const [instruction, setInstruction] = useState<string>(
+    "You are Niko, a calm and thoughtful AI assistant. Respond to user queries with empathy and clarity."
+  );
+
+
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   const startAIVoice = () => {
@@ -29,6 +35,13 @@ export default function App() {
       stopSpeechRecognition();
     }
   };
+
+
+  const applyStyleAndInstruction = () => { 
+     setBtnText("START");
+      setStart(false);
+      stopSpeechRecognition();
+  }
 
   const startSpeechRecognition = () => {
     const SpeechRecognition =
@@ -97,10 +110,12 @@ export default function App() {
     setConversation(updatedConversation);
 
     try {
+      console.log(`HERE IS THE UPDATED CONVERSATION:`, updatedConversation);
+
       const res = await fetch("http://localhost:8000/api/gemini/text", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updatedConversation }),
+        body: JSON.stringify({ messages: updatedConversation, style, system_instruction: instruction }),
       });
 
       const data = await res.json();
@@ -124,7 +139,7 @@ export default function App() {
       const res = await fetch("http://localhost:8000/api/murf/audio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: geminiText }),
+        body: JSON.stringify({ text: geminiText, style: style }),
       });
 
       const data = await res.json();
@@ -162,17 +177,68 @@ export default function App() {
       )}
 
       {transcribedText && (
-  <div className="mt-6 max-w-xl w-full px-4 py-3 bg-zinc-800/40 rounded-xl space-y-2 my-4">
+        <div className="mt-6 max-w-xl w-full px-4 py-3 bg-zinc-800/40 rounded-xl space-y-2 my-4">
           <span className="text-lg font-semibold">You said:</span>
           <span className="text-md mt-1 ml-3 italic leading-relaxed">
             {transcribedText}
           </span>
         </div>
-      )} 
-
-    
+      )}
 
       {isThinking && <GeminiThinking />}
+
+       {/* <div className="mt-8 w-full max-w-4xl px-4 flex flex-col md:flex-row gap-6 items-start md:items-end justify-between">
+        <div className="w-full space-y-5 mx-auto">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-green-300">
+              Conversation Style
+            </label>
+            <select
+              value={style}
+              onChange={(e) => setStyle(e.target.value)}
+              className="bg-zinc-800 text-white px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="Conversational">😊 Conversational</option>
+              <option value="Newscast Formal">📰 Newscast Formal</option>
+              <option value="Angry">😡 Angry</option>
+              <option value="Sad">😔 Sad</option>
+              <option value="Furious">😤 Furious</option>
+              <option value="Narration">📜 Narrattion </option>
+              <option value="Meditative">⭐ Meditative</option>
+              <option value="Inspirational">💪 Inspirational</option>
+            </select>
+          </div>
+
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-green-300">
+              System Instruction
+            </label>
+            <textarea
+              value={instruction}
+              onChange={(e) => setInstruction(e.target.value)}
+              placeholder="Describe how Niko should behave... or give Niko a fun nickname!"
+              className="bg-zinc-800 text-white px-4 py-2 rounded-lg w-full h-24 resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center mt-6 gap-3 sm:gap-4 w-full">
+            <button
+              onClick={applyStyleAndInstruction}
+              className="text-lg sm:text-xl font-semibold px-5 py-3 sm:px-6 sm:py-3 rounded-full bg-gradient-to-r from-green-500 to-zinc-700 hover:from-zinc-500 hover:to-green-600 transition-all text-white shadow-md hover:shadow-green-500/50 w-full sm:w-auto"
+            >
+              Apply Settings
+            </button>
+
+            <button
+              onClick={startAIVoice}
+              className="text-lg sm:text-xl font-semibold px-5 py-3 sm:px-6 sm:py-3 rounded-full bg-gradient-to-r from-green-500 to-zinc-700 hover:from-zinc-500 hover:to-green-600 transition-all text-white shadow-md hover:shadow-green-500/50 w-full sm:w-auto"
+            >
+              {btnText}
+            </button>
+          </div>
+        </div>
+      </div> */}
+
 
       <div className="flex items-center justify-center mt-4">
         <button
