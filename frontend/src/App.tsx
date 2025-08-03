@@ -185,7 +185,7 @@ export default function App() {
 
       {isThinking && <GeminiThinking />}
 
-
+{/* 
            <div className="mt-8 w-full max-w-4xl px-4 flex flex-col md:flex-row gap-6 items-start md:items-end justify-between">
         <div className="w-full space-y-5 mx-auto">
           <div className="grid gap-2">
@@ -236,18 +236,18 @@ export default function App() {
             </button>
           </div>
         </div>
-      </div> 
+      </div>  */}
 
 
 
-      {/* <div className="flex items-center justify-center mt-4">
+      <div className="flex items-center justify-center mt-4">
         <button
           className="text-2xl font-bold px-6 py-3 rounded-full bg-gradient-to-r from-green-500 to-zinc-700 hover:from-zinc-500 hover:to-green-600 transition-all text-white shadow-lg cursor-pointer hover:shadow-green-500/50"
           onClick={startAIVoice}
         >
           {btnText}
         </button>
-      </div> */}
+      </div> 
     </section>
   );
 }
