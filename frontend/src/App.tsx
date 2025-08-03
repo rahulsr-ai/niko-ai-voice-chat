@@ -1,4 +1,5 @@
 // @ts-ignore
+type SpeechRecognitionEvent = any;
 
 import React, { useRef, useState } from "react";
 import SpeakingAura from "./components/ai-speak";
@@ -24,7 +25,7 @@ export default function App() {
   );
 
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionEvent | null>(null);
 
   const startAIVoice = () => {
     if (!start) {
@@ -85,7 +86,7 @@ export default function App() {
       }
     };
 
-    recognition.onerror = (e) => {
+    recognition.onerror = (e: any) => {
       console.error("Speech recognition error:", e.error);
     };
 
@@ -107,7 +108,7 @@ export default function App() {
     // Add user message to local conversation
     const updatedConversation = [
       ...conversation,
-      { role: "user", message: userText },
+      { role: "user" as "user", message: userText },
     ];
     setConversation(updatedConversation);
 
