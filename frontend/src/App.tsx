@@ -124,7 +124,7 @@ export default function App() {
       const replyText = data.reply || "⚠️ No response from Gemini";
 
       // Add Gemini reply to conversation
-      setConversation((prev) => [...prev, { role: "ai", message: replyText }]);
+       setConversation((prev) => [...prev, { role: "ai" as "user" | "ai", message: replyText }]);
       setAiReply(replyText);
 
       sendGeminiToSpeech(replyText);
