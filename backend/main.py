@@ -20,7 +20,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For dev only. Use specific domain in prod
+    allow_origins=["https://talkwithniko.netlify.app/"],  # For dev only. Use specific domain in prod
     allow_methods=["*"],
     allow_headers=["*"],
 )
