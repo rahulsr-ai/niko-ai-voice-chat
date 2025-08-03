@@ -9,6 +9,19 @@ import GeminiThinking from "./components/GeminiThinking";
 export default function App() {
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
+  if (BASE_URL === undefined) {
+    console.error("❌ VITE_BACKEND_URL is not defined in .env file");
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <h1 className="text-2xl font-bold">
+          Please set <code>VITE_BACKEND_URL</code> in your <code>.env</code> file.
+        </h1>
+      </div>
+    );
+  }
+
+  console.log("🌐 Backend URL:", BASE_URL);
+
   const [start, setStart] = useState(false);
   const [btnText, setBtnText] = useState("START");
   const [transcribedText, setTranscribedText] = useState("");
