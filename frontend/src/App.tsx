@@ -7,7 +7,7 @@ import SpeakingLine from "./components/SpeakingLine";
 import GeminiThinking from "./components/GeminiThinking";
 
 export default function App() {
-  const BASE_URL = import.meta.env.BASE_URL;
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
   const [start, setStart] = useState(false);
   const [btnText, setBtnText] = useState("START");
