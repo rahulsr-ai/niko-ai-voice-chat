@@ -6,6 +6,8 @@ import SpeakingLine from "./components/SpeakingLine";
 import GeminiThinking from "./components/GeminiThinking";
 
 export default function App() {
+  const BASE_URL = import.meta.env.BASE_URL
+
   const [start, setStart] = useState(false);
   const [btnText, setBtnText] = useState("START");
   const [isListening, setIsListening] = useState(false);
@@ -112,7 +114,7 @@ export default function App() {
     try {
       console.log(`HERE IS THE UPDATED CONVERSATION:`, updatedConversation);
 
-      const res = await fetch("http://localhost:8000/api/gemini/text", {
+      const res = await fetch(`${BASE_URL}/api/gemini/text`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: updatedConversation, style, system_instruction: instruction }),
@@ -136,7 +138,7 @@ export default function App() {
 
   async function sendGeminiToSpeech(geminiText: string) {
     try {
-      const res = await fetch("http://localhost:8000/api/murf/audio", {
+      const res = await fetch(`${BASE_URL}/api/murf/audio`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: geminiText, style: style }),
