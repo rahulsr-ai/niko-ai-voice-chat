@@ -1,9 +1,6 @@
-import requests
-from playsound3 import playsound  # or use playsound if works
 from murf import Murf
 import os 
-from fastapi.middleware.cors import CORSMiddleware
-import speech_recognition as sr 
+from fastapi.middleware.cors import CORSMiddleware 
 from google import genai
 from pydantic import BaseModel
 from google.genai import types
