@@ -8,7 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Literal, Optional
 from google import genai
-from google.genai import types
+import google.generativeai as genai
+
 
 # Load environment variables
 load_dotenv()
