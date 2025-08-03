@@ -7,7 +7,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Literal, Optional
-from google import genai
 import google.generativeai as genai
 
 
@@ -21,6 +20,7 @@ murf_key = os.getenv("MURF_API_KEY")
 # Check if keys are provided
 if not gemini_key or not murf_key:
     raise RuntimeError("❌ GEMINI_API_KEY and MURF_API_KEY must be set in environment variables.")
+
 
 # Initialize clients
 Geminiclient = genai.Client(api_key=gemini_key)
