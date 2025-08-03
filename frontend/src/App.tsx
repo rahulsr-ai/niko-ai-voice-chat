@@ -20,7 +20,7 @@ export default function App() {
     );
   }
 
-  console.log("🌐 Backend URL:", BASE_URL);
+  // console.log("🌐 Backend URL:", BASE_URL);
 
   const [start, setStart] = useState(false);
   const [btnText, setBtnText] = useState("START");
