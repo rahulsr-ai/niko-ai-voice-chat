@@ -23,6 +23,10 @@ export default function App() {
   // console.log("🌐 Backend URL:", BASE_URL);
 
   const [start, setStart] = useState(false);
+  const [style, setStyle] = useState("Conversational");
+  const [instruction, setInstruction] = useState(
+    "You are Niko, a calm and thoughtful AI assistant. Respond to user queries with empathy and clarity."
+  );
   const [btnText, setBtnText] = useState("START");
   const [transcribedText, setTranscribedText] = useState("");
   const [isThinking, setIsThinking] = useState(false);
@@ -43,6 +47,12 @@ export default function App() {
       stopSpeechRecognition();
     }
   };
+
+  function applyStyleAndInstruction() {
+     setBtnText("START");
+      setStart(false);
+      stopSpeechRecognition();
+  }
 
   const startSpeechRecognition = () => {
     const SpeechRecognition =
@@ -107,9 +117,8 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: updatedConversation,
-          style: "Conversational",
-          system_instruction:
-            "You are Niko, a calm and thoughtful AI assistant. Respond to user queries with empathy and clarity.",
+          style: style ,
+          system_instruction: instruction,
         }),
       });
 
@@ -130,7 +139,7 @@ export default function App() {
       const res = await fetch(`${BASE_URL}/api/murf/audio`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: geminiText, style: "Conversational" }),
+        body: JSON.stringify({ text: geminiText, style: style}),
       });
 
       const data = await res.json();
@@ -176,14 +185,69 @@ export default function App() {
 
       {isThinking && <GeminiThinking />}
 
-      <div className="flex items-center justify-center mt-4">
+
+           <div className="mt-8 w-full max-w-4xl px-4 flex flex-col md:flex-row gap-6 items-start md:items-end justify-between">
+        <div className="w-full space-y-5 mx-auto">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-green-300">
+              Conversation Style
+            </label>
+            <select
+              value={style}
+              onChange={(e) => setStyle(e.target.value)}
+              className="bg-zinc-800 text-white px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="Conversational">😊 Conversational</option>
+              <option value="Newscast Formal">📰 Newscast Formal</option>
+              <option value="Angry">😡 Angry</option>
+              <option value="Sad">😔 Sad</option>
+              <option value="Furious">😤 Furious</option>
+              <option value="Narration">📜 Narrattion </option>
+              <option value="Meditative">⭐ Meditative</option>
+              <option value="Inspirational">💪 Inspirational</option>
+            </select>
+          </div>
+
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-green-300">
+              System Instruction
+            </label>
+            <textarea
+              value={instruction}
+              onChange={(e) => setInstruction(e.target.value)}
+              placeholder="Describe how Niko should behave... or give Niko a fun nickname!"
+              className="bg-zinc-800 text-white px-4 py-2 rounded-lg w-full h-24 resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center mt-6 gap-3 sm:gap-4 w-full">
+            <button
+              onClick={applyStyleAndInstruction}
+              className="text-lg sm:text-xl font-semibold px-5 py-3 sm:px-6 sm:py-3 rounded-full bg-gradient-to-r from-green-500 to-zinc-700 hover:from-zinc-500 hover:to-green-600 transition-all text-white shadow-md hover:shadow-green-500/50 w-full sm:w-auto"
+            >
+              Apply Settings
+            </button>
+
+            <button
+              onClick={startAIVoice}
+              className="text-lg sm:text-xl font-semibold px-5 py-3 sm:px-6 sm:py-3 rounded-full bg-gradient-to-r from-green-500 to-zinc-700 hover:from-zinc-500 hover:to-green-600 transition-all text-white shadow-md hover:shadow-green-500/50 w-full sm:w-auto"
+            >
+              {btnText}
+            </button>
+          </div>
+        </div>
+      </div> 
+
+
+
+      {/* <div className="flex items-center justify-center mt-4">
         <button
           className="text-2xl font-bold px-6 py-3 rounded-full bg-gradient-to-r from-green-500 to-zinc-700 hover:from-zinc-500 hover:to-green-600 transition-all text-white shadow-lg cursor-pointer hover:shadow-green-500/50"
           onClick={startAIVoice}
         >
           {btnText}
         </button>
-      </div>
+      </div> */}
     </section>
   );
 }
