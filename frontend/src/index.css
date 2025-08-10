@@ -39,12 +39,6 @@ body::before {
 
 
 
-.aura-circle {
-  animation: pulseAura 2s ease-in-out infinite;
-  transition: all 0.3s ease;
-  filter: blur(0.3px);
-}
-
 @keyframes linePulse {
   0%, 100% {
     height: 10%;
@@ -61,3 +55,21 @@ body::before {
   animation: linePulse 1s ease-in-out infinite;
   transform-origin: bottom;
 }
+
+
+@keyframes fade-in-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-down {
+  animation: fade-in-down 0.3s ease-out;
+}
+
+

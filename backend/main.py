@@ -20,11 +20,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://talkwithniko.netlify.app"],
+    # allow_origins=["https://talkwithniko.netlify.app"],
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 
 
@@ -36,19 +36,16 @@ class ConversationRequest(BaseModel):
     messages: List[Message]
 
 
-
 class ConversationRequest(BaseModel):
     messages: List[Message]
     style: Optional[str] = "Helpful"
     system_instruction: Optional[str] = "You are Niko, a calm and helpful AI."
 
 
-
-
-
 class TTSInput(BaseModel):
     text: str
     style: Optional[str] = "Conversational"
+    language: Optional[str] = "English"  # Default language is Hindi
 
     
 
@@ -64,6 +61,7 @@ async def generate_reply(payload: ConversationRequest):
     print(f'HERE IS YOUR PAYLOD: {payload}')
     latest_user_input = ""
     sys_intruction = ""
+    imp_instructions = "Your responses will be spoken aloud, so reply naturally as if you're talking to the user. Don’t mention anything about being a text model or not being able to speak."
     for msg in reversed(payload.messages):
         if msg.role == "user":
             latest_user_input = msg.message
@@ -73,9 +71,9 @@ async def generate_reply(payload: ConversationRequest):
         return {"reply": "⚠️ No valid user input found."}
 
     if not payload.system_instruction:
-        sys_intruction = f'You are Niko, be {payload.style} in your response and Keep replies short, and relevant.'
+        sys_intruction = f'You are Niko, {imp_instructions} be {payload.style} in your response and Keep replies short, and relevant.'
     else: 
-        sys_intruction = f'{payload.system_instruction} be {payload.style} in your response and Keep replies short, and relevant.' 
+        sys_intruction = f'{payload.system_instruction} {{imp_instructions}} be {payload.style} in your response and Keep replies short, and relevant.' 
         
 
     try:
@@ -101,16 +99,36 @@ async def generate_reply(payload: ConversationRequest):
 
 @app.post("/api/murf/audio")
 def handle_AI_voice(data: TTSInput):  
-    print("🤖 Generating AI voice for:", data.text)  
+    
+    voiceId = ""
+    native_locale = ""
 
+    if data.language == "Hindi": 
+        voiceId = "en-UK-hazel"  
+        native_locale = "hi-IN"
+    elif data.language == "French":
+        native_locale = "fr-FR"
+        voiceId = "en-UK-hazel" 
+    elif data.language == "Spanish":
+        native_locale = "es-ES"
+        voiceId = "en-UK-hazel" 
+    else : 
+         voiceId = "en-US-natalie"  
+         native_locale = "en-US"
+        
 
+        
     print(f"Using style: {data.style}")
+    print(f"Language: {data.language}, Native Locale: {native_locale}")
+    print(f"Using VoiceId: {voiceId} for language {data.language}")
+
+    
      
     response = client.text_to_speech.generate(
         text=data.text,
-        voice_id="en-US-natalie",
+        voice_id=voiceId,
         style= data.style,
-        pitch=0,
+        multi_native_locale=native_locale,
     )
 
     audio_url = response.audio_file

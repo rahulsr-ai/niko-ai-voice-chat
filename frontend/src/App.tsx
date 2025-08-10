@@ -1,10 +1,12 @@
 // @ts-ignore
 type SpeechRecognitionEvent = any;
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SpeakingAura from "./components/ai-speak";
 import SpeakingLine from "./components/SpeakingLine";
 import GeminiThinking from "./components/GeminiThinking";
+import allStyles from "./styles";
+import Notification from "./components/Notification";
 
 export default function App() {
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
@@ -14,7 +16,8 @@ export default function App() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <h1 className="text-2xl font-bold">
-          Please set <code>VITE_BACKEND_URL</code> in your <code>.env</code> file.
+          Please set <code>VITE_BACKEND_URL</code> in your <code>.env</code>{" "}
+          file.
         </h1>
       </div>
     );
@@ -23,15 +26,26 @@ export default function App() {
   // console.log("🌐 Backend URL:", BASE_URL);
 
   const [start, setStart] = useState(false);
-
   const [btnText, setBtnText] = useState("START");
   const [transcribedText, setTranscribedText] = useState("");
   const [isThinking, setIsThinking] = useState(false);
+  const [language, setLanguage] = useState("English");
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState("");
+
   const [conversation, setConversation] = useState<
     { role: "user" | "ai"; message: string }[]
   >([]);
+  const [style, setStyle] = useState("Conversational");
+  const [instruction, setInstruction] = useState(
+    "You are Niko, a calm and thoughtful AI assistant. Respond to user queries with empathy and clarity."
+  );
+
+  const [styleOptions, setStyleOptions] = useState(allStyles);
 
   const recognitionRef = useRef<SpeechRecognitionEvent | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
 
   const startAIVoice = () => {
     if (!start) {
@@ -45,11 +59,10 @@ export default function App() {
     }
   };
 
-
-
   const startSpeechRecognition = () => {
     const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       alert("❌ Your browser doesn't support Speech Recognition.");
@@ -78,6 +91,7 @@ export default function App() {
 
     recognition.onend = () => {
       console.log("🛑 Speech recognition stopped.");
+
       if (finalTranscript.trim()) {
         sendToGemini(finalTranscript);
       } else if (start) {
@@ -101,7 +115,10 @@ export default function App() {
   const sendToGemini = async (userText: string) => {
     setIsThinking(true);
 
-    const updatedConversation = [...conversation, { role: "user", message: userText }];
+    const updatedConversation = [
+      ...conversation,
+      { role: "user", message: userText },
+    ];
     setConversation(updatedConversation as any);
 
     try {
@@ -111,7 +128,8 @@ export default function App() {
         body: JSON.stringify({
           messages: updatedConversation,
           style: "Conversational",
-          system_instruction: "Your name is Niko, an AI assistant. You are friendly, helpful, and always ready to assist.",
+          system_instruction:
+            "Your name is Niko, an AI assistant. You are friendly, helpful, and always ready to assist.",
         }),
       });
 
@@ -132,26 +150,77 @@ export default function App() {
       const res = await fetch(`${BASE_URL}/api/murf/audio`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: geminiText, style: "Conversational" }),
+        body: JSON.stringify({
+          text: geminiText,
+          style: style,
+          language: language,
+        }),
       });
 
       const data = await res.json();
       const audio = new Audio(data.audio_url);
+      audioRef.current = audio;
+
 
       audio.onended = () => {
         console.log("🔁 Restarting voice listening...");
         startSpeechRecognition();
       };
 
-      audio.play();
+    
+      audio.play()
     } catch (error) {
       console.error("❌ Error sending Gemini text to speech:", error);
     }
   }
 
+  function applyStyleAndInstruction() {
+    setBtnText("START");
+    setStart(false);
+    setNotificationMsg("✅ Settings applied successfully!");
+    setShowNotification(true);
+    stopSpeechRecognition();
+  }
+
+  function handleLanguageChange(e: string) {
+    switch (e) {
+      case "Spanish":
+        setStyleOptions([
+          { label: "😊 Conversational", value: "Conversational" },
+        ]);
+        break;
+
+      case "Hindi":
+        setStyleOptions([
+          { label: "😊 Conversational", value: "Conversational" },
+        ]);
+        break;
+
+      case "French":
+        setStyleOptions([
+          { label: "😊 Conversational", value: "Conversational" },
+        ]);
+        break;
+
+      default:
+        setStyleOptions(allStyles);
+        break;
+    }
+    setLanguage(e);
+  }
+
+
+
+  
   return (
     <section className="min-h-screen w-full flex flex-col items-center justify-center px-4 bg-black text-white">
       <h3 className="font-bold text-white text-3xl">
+        {showNotification && (
+          <Notification
+            message={notificationMsg}
+            onClose={() => setShowNotification(false)}
+          />
+        )}
         SPEAK WITH <span className="text-green-600">NIKO</span>
       </h3>
 
@@ -178,17 +247,72 @@ export default function App() {
 
       {isThinking && <GeminiThinking />}
 
+      <div className="mt-8 w-full max-w-4xl px-4 flex flex-col md:flex-row gap-6 items-start md:items-end justify-between">
+        <div className="w-full space-y-5 mx-auto">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-sm font-medium text-green-300">
+                Conversation Style
+              </label>
+              <select
+                value={style}
+                onChange={(e) => setStyle(e.target.value)}
+                className="bg-zinc-800 text-white px-3 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                {styleOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
+            <div>
+              <label className="text-sm font-medium text-green-300">
+                Accent
+              </label>
+              <select
+                value={language}
+                onChange={(e) => handleLanguageChange(e.target.value)}
+                className="bg-zinc-800 text-white px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="Hindi">Indian</option>
+                <option value="English">US </option>
+                <option value="French">French </option>
+                <option value="Spanish">Spanish </option>
+              </select>
+            </div>
+          </div>
 
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-green-300">
+              System Instruction
+            </label>
+            <textarea
+              value={instruction}
+              onChange={(e) => setInstruction(e.target.value)}
+              placeholder="Describe how Niko should behave... or give Niko a fun nickname!"
+              className="bg-zinc-800 text-white px-4 py-2 rounded-lg w-full h-24 resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
 
-      <div className="flex items-center justify-center mt-4">
-        <button
-          className="text-2xl font-bold px-6 py-3 rounded-full bg-gradient-to-r from-green-500 to-zinc-700 hover:from-zinc-500 hover:to-green-600 transition-all text-white shadow-lg cursor-pointer hover:shadow-green-500/50"
-          onClick={startAIVoice}
-        >
-          {btnText}
-        </button>
-      </div> 
+          <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center mt-6 gap-3 sm:gap-4 w-full">
+            <button
+              onClick={applyStyleAndInstruction}
+              className="text-lg sm:text-xl font-semibold px-5 py-3 sm:px-6 sm:py-3 rounded-full bg-gradient-to-r from-green-500 to-zinc-700 hover:from-zinc-500 hover:to-green-600 transition-all text-white shadow-md hover:shadow-green-500/50 w-full sm:w-auto cursor-pointer"
+            >
+              Apply Settings
+            </button>
+
+            <button
+              onClick={startAIVoice}
+              className="text-lg sm:text-xl font-semibold px-5 py-3 sm:px-6 sm:py-3 rounded-full bg-gradient-to-r from-green-500 to-zinc-700 hover:from-zinc-500 hover:to-green-600 transition-all text-white shadow-md hover:shadow-green-500/50 w-full sm:w-auto cursor-pointer"
+            >
+              {btnText}
+            </button>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
