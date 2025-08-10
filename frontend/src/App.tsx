@@ -1,7 +1,7 @@
 // @ts-ignore
 type SpeechRecognitionEvent = any;
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import SpeakingAura from "./components/ai-speak";
 import SpeakingLine from "./components/SpeakingLine";
 import GeminiThinking from "./components/GeminiThinking";
