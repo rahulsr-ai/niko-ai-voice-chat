@@ -71,10 +71,12 @@ async def generate_reply(payload: ConversationRequest):
         return {"reply": "⚠️ No valid user input found."}
 
     if not payload.system_instruction:
-        sys_intruction = f'You are Niko, {imp_instructions} be {payload.style} in your response and Keep replies short, and relevant.'
+        sys_intruction = f', {imp_instructions} be {payload.style} in your response and Keep replies short, and relevant.'
     else: 
-        sys_intruction = f'{payload.system_instruction} {{imp_instructions}} be {payload.style} in your response and Keep replies short, and relevant.' 
-        
+        sys_intruction = f'{payload.system_instruction} {imp_instructions} be {payload.style} in your response and Keep replies short, and relevant.' 
+
+
+        print(f"TAILOR INSTRUCTION FOR GEMINI {sys_intruction} ")
 
     try:
         # Send only latest input to chat session (it remembers the rest)
@@ -118,17 +120,18 @@ def handle_AI_voice(data: TTSInput):
         
 
         
-    print(f"Using style: {data.style}")
     print(f"Language: {data.language}, Native Locale: {native_locale}")
-    print(f"Using VoiceId: {voiceId} for language {data.language}")
+    print(f"Using VoiceId: {voiceId} for language {data.language} WHICHI THIS STYLE {data.style}")
+
+
 
     
      
     response = client.text_to_speech.generate(
-        text=data.text,
-        voice_id=voiceId,
-        style= data.style,
-        multi_native_locale=native_locale,
+        text = data.text,
+        voice_id = voiceId,
+        style = data.style,
+        multi_native_locale = native_locale,
     )
 
     audio_url = response.audio_file

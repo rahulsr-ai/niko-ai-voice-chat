@@ -1,5 +1,5 @@
 // @ts-ignore
-type SpeechRecognitionEvent = any;
+type SpeechRecognitionEvent = any
 
 import { useRef, useState } from "react";
 import SpeakingAura from "./components/ai-speak";
@@ -11,19 +11,8 @@ import Notification from "./components/Notification";
 export default function App() {
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
-  if (BASE_URL === undefined) {
-    console.error("❌ VITE_BACKEND_URL is not defined in .env file");
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        <h1 className="text-2xl font-bold">
-          Please set <code>VITE_BACKEND_URL</code> in your <code>.env</code>{" "}
-          file.
-        </h1>
-      </div>
-    );
-  }
 
-  // console.log("🌐 Backend URL:", BASE_URL);
+  console.log("🌐 Backend URL:", BASE_URL);
 
   const [start, setStart] = useState(false);
   const [btnText, setBtnText] = useState("START");
@@ -37,14 +26,27 @@ export default function App() {
     { role: "user" | "ai"; message: string }[]
   >([]);
   const [style, setStyle] = useState("Conversational");
-  const [instruction, setInstruction] = useState(
+  const [instruction, setInstruction] = useState<string>(
     "You are Niko, a calm and thoughtful AI assistant. Respond to user queries with empathy and clarity."
   );
 
-  const [styleOptions, setStyleOptions] = useState(allStyles);
+  const [styleOptions, setStyleOptions] = useState<string>(allStyles);
 
   const recognitionRef = useRef<SpeechRecognitionEvent | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  
+  if (BASE_URL === undefined) {
+    console.error("❌ VITE_BACKEND_URL is not defined in .env file");
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <h1 className="text-2xl font-bold">
+          Please set <code>VITE_BACKEND_URL</code> in your <code>.env</code>{" "}
+          file.
+        </h1>
+      </div>
+    );
+  }
 
 
   const startAIVoice = () => {
@@ -127,9 +129,8 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: updatedConversation,
-          style: "Conversational",
-          system_instruction:
-            "Your name is Niko, an AI assistant. You are friendly, helpful, and always ready to assist.",
+          style: style,
+          system_instruction: instruction,
         }),
       });
 
