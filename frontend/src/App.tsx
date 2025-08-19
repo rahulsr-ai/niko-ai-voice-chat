@@ -1,6 +1,4 @@
-// @ts-ignore
-type SpeechRecognitionEvent = any
-
+//@ts-ignore
 import { useRef, useState } from "react";
 import SpeakingAura from "./components/ai-speak";
 import SpeakingLine from "./components/SpeakingLine";
@@ -10,7 +8,6 @@ import Notification from "./components/Notification";
 
 export default function App() {
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
-
 
   console.log("🌐 Backend URL:", BASE_URL);
 
@@ -30,12 +27,12 @@ export default function App() {
     "You are Niko, a calm and thoughtful AI assistant. Respond to user queries with empathy and clarity."
   );
 
-  const [styleOptions, setStyleOptions] = useState<string>(allStyles);
+  const [styleOptions, setStyleOptions] =
+    useState<{ label: string; value: string }[]>(allStyles);
 
-  const recognitionRef = useRef<SpeechRecognitionEvent | null>(null);
+  const recognitionRef = useRef<Window | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  
   if (BASE_URL === undefined) {
     console.error("❌ VITE_BACKEND_URL is not defined in .env file");
     return (
@@ -47,7 +44,6 @@ export default function App() {
       </div>
     );
   }
-
 
   const startAIVoice = () => {
     if (!start) {
@@ -80,7 +76,7 @@ export default function App() {
 
     let finalTranscript = "";
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: any) => {
       let transcript = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript;
@@ -162,14 +158,12 @@ export default function App() {
       const audio = new Audio(data.audio_url);
       audioRef.current = audio;
 
-
       audio.onended = () => {
         console.log("🔁 Restarting voice listening...");
         startSpeechRecognition();
       };
 
-    
-      audio.play()
+      audio.play();
     } catch (error) {
       console.error("❌ Error sending Gemini text to speech:", error);
     }
@@ -210,9 +204,6 @@ export default function App() {
     setLanguage(e);
   }
 
-
-
-  
   return (
     <section className="min-h-screen w-full flex flex-col items-center justify-center px-4 bg-black text-white">
       <h3 className="font-bold text-white text-3xl">
