@@ -177,31 +177,34 @@ export default function App() {
     stopSpeechRecognition();
   }
 
-  function handleLanguageChange(e: string) {
-    switch (e) {
+  function handleLanguageChange(value: string) {
+    switch (value) {
       case "Spanish":
         setStyleOptions([
           { label: "😊 Conversational", value: "Conversational" },
         ]);
+        setStyle("Conversational");
         break;
 
       case "Hindi":
         setStyleOptions([
           { label: "😊 Conversational", value: "Conversational" },
         ]);
+        setStyle("Conversational");
         break;
 
       case "French":
         setStyleOptions([
           { label: "😊 Conversational", value: "Conversational" },
         ]);
+        setStyle("Conversational");
         break;
 
       default:
         setStyleOptions(allStyles);
         break;
     }
-    setLanguage(e);
+    setLanguage(value);
   }
 
   return (
